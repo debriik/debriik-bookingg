@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Debriik – LEGO Guestbook Booking</title>
+<style>
+:root{--bg:#fff7f8;--card:#fff;--ink:#2b2226;--mute:#7a6a70;--pink:#f6c9d0;--accent:#d6456b;--line:#eed9de;--off:#e9e2e4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1619;--card:#272024;--ink:#f4eaed;--mute:#b5a2a8;--pink:#4a2a33;--accent:#ff7d9c;--line:#3b2e33;--off:#352c30;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1c1619;--card:#272024;--ink:#f4eaed;--mute:#b5a2a8;--pink:#4a2a33;--accent:#ff7d9c;--line:#3b2e33;--off:#352c30;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+main{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:1.5rem;margin:8px 0 2px;text-align:center}
+.sub{text-align:center;color:var(--mute);margin:0 0 16px;font-size:.9rem}
+h2{font-size:1.05rem;margin:22px 0 8px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer}
+.card.sel{border-color:var(--accent);background:var(--pink)}
+.card .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card b{font-size:1.05rem}.price{font-weight:800;color:var(--accent);font-size:1.2rem}
+.card ul{margin:8px 0 0;padding-left:18px;font-size:.88rem;color:var(--mute)}
+.note{font-size:.78rem;color:var(--mute)}
+.cal{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.nav button{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;width:36px;height:36px;font-size:1rem}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.grid .h{font-size:.72rem;color:var(--mute)}
+.d{padding:9px 0;border-radius:8px;border:0;background:none;color:var(--ink);font-size:.9rem}
+.d:disabled{color:var(--mute);opacity:.45;background:var(--off);text-decoration:line-through}
+.d.sel{background:var(--accent);color:#fff;font-weight:700}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:.92rem}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:1.1rem}
+input,textarea{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;margin-bottom:8px}
+.sum{background:var(--card);border:2px dashed var(--accent);border-radius:14px;padding:14px;font-size:.93rem}
+.sum div{display:flex;justify-content:space-between;padding:2px 0}
+.sum .t{font-weight:800;border-top:1px solid var(--line);margin-top:6px;padding-top:6px}
+.go{width:100%;margin-top:14px;padding:15px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-size:1.05rem;font-weight:700}
+details{margin-top:18px;font-size:.85rem;color:var(--mute)}summary{font-weight:700;color:var(--ink)}
+.err{color:var(--accent);font-size:.85rem;min-height:1.2em;margin-top:8px;text-align:center}
+</style>
+</head>
+<body>
+<main>
+<h1>LEGO Guestbook</h1>
+<p class="sub">Tempah slot majlis anda · debriik.my</p>
+
+<h2>1. Pilih Pakej</h2>
+<div class="card" id="pA" data-p="A"><div class="top"><b>Pakej A</b><span class="price">RM569</span></div>
+<ul><li>Frame 50x70cm</li><li>Vending machine + capsule (sewa)</li><li>100 Lego minifigure rawak (termasuk pengantin)</li><li>Lego name tile, Moc brick &amp; marker</li><li>Dekorasi &amp; meja setup · 4 jam</li></ul></div>
+<div class="card" id="pB" data-p="B"><div class="top"><b>Pakej B</b><span class="price">RM469</span></div>
+<ul><li>Frame 40x50cm</li><li>Vending machine + capsule (sewa)</li><li>50 Lego minifigure rawak (termasuk pengantin)</li><li>Lego name tile, Moc brick &amp; marker</li><li>Dekorasi &amp; meja setup · 4 jam</li></ul></div>
+<p class="note">*Pengangkutan &amp; petugas di lokasi tidak termasuk.</p>
+
+<h2>2. Pilih Tarikh</h2>
+<div class="cal">
+<div class="nav"><button id="prev" aria-label="Bulan lepas">‹</button><b id="mon"></b><button id="next" aria-label="Bulan depan">›</button></div>
+<div class="grid" id="grid"></div>
+</div>
+<p class="note">Tarikh yang dicoret sudah ditempah / tidak tersedia.</p>
+
+<h2>3. Tambahan (pilihan)</h2>
+<div class="row"><span>LEGO Bride &amp; Groom<br><span class="note">RM15 / pasangan</span></span><div class="qty"><button data-a="bg" data-d="-1">−</button><b id="q_bg">0</b><button data-a="bg" data-d="1">+</button></div></div>
+<div class="row"><span>Petugas di lokasi (4 jam)<br><span class="note">RM80 / orang</span></span><div class="qty"><button data-a="att" data-d="-1">−</button><b id="q_att">0</b><button data-a="att" data-d="1">+</button></div></div>
+
+<h2>4. Maklumat Anda</h2>
+<input id="name" placeholder="Nama penuh" autocomplete="name">
+<input id="phone" placeholder="No. telefon (WhatsApp)" inputmode="tel" autocomplete="tel">
+<input id="venue" placeholder="Lokasi / nama dewan majlis">
+<input id="time" placeholder="Masa majlis (cth: 11am – 3pm)">
+
+<h2>Ringkasan</h2>
+<div class="sum" id="sum"></div>
+<div class="err" id="err"></div>
+<button class="go" id="go">Teruskan ke Google Form</button>
+<button class="go" id="wa" style="background:var(--card);color:var(--accent);border:2px solid var(--accent)">Atau tanya melalui WhatsApp</button>
+<p class="note" style="text-align:center">Tempahan disahkan selepas borang &amp; deposit 50% diterima.</p>
+
+<details><summary>Terma &amp; Syarat</summary>
+<ul>
+<li>Tempahan disahkan selepas Google Form dihantar dan deposit 50% dibayar.</li>
+<li>Deposit tidak boleh dikembalikan jika tempahan dibatalkan.</li>
+<li>Bayaran penuh sekurang-kurangnya 1 minggu sebelum tarikh majlis.</li>
+<li>Sebarang perubahan perlu dimaklumkan awal dan tertakluk kepada ketersediaan.</li>
+<li>Staf vendor tidak termasuk; anda perlu atur ahli keluarga/kawan untuk jaga booth.</li>
+<li>LEGO adalah rawak &amp; tidak berjenama.</li>
+<li>Vending machine, capsule dan stand disediakan secara sewaan.</li>
+<li>Penempah bertanggungjawab ke atas semua item sepanjang tempoh sewa. Kehilangan/kerosakan boleh dikenakan caj.</li>
+</ul></details>
+</main>
+<script>
+// === ADMIN: tukar di sini ===
+var WA_NUMBER = "60136434236";
+var FORM_URL = "https://forms.gle/qD8cNRSE42rQ9QTr6";
+var BOOKED = ["2026-11-21","2026-11-22","2026-12-05","2026-12-06"]; // tarikh penuh (YYYY-MM-DD)
+// ============================
+var PRICE = {A:569,B:469}, BG=15, ATT=80;
+var st = {pkg:null, date:null, bg:0, att:0};
+var today = new Date(); today.setHours(0,0,0,0);
+var view = new Date(today.getFullYear(), today.getMonth(), 1);
+var MONTHS=["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+function $(i){return document.getElementById(i)}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function rm(n){return "RM"+n}
+function drawCal(){
+  $("mon").textContent = MONTHS[view.getMonth()]+" "+view.getFullYear();
+  var g=$("grid"); g.innerHTML="";
+  ["Is","Se","Ra","Kh","Ju","Sa","Ah"].forEach(function(t){var h=document.createElement("div");h.className="h";h.textContent=t;g.appendChild(h)});
+  var first=(new Date(view.getFullYear(),view.getMonth(),1).getDay()+6)%7;
+  for(var i=0;i<first;i++)g.appendChild(document.createElement("div"));
+  var n=new Date(view.getFullYear(),view.getMonth()+1,0).getDate();
+  for(var d=1;d<=n;d++){
+    var dt=new Date(view.getFullYear(),view.getMonth(),d), s=iso(dt);
+    var b=document.createElement("button"); b.className="d"+(st.date===s?" sel":""); b.textContent=d;
+    if(dt<=today||BOOKED.indexOf(s)>-1) b.disabled=true;
+    b.onclick=(function(s){return function(){st.date=s;drawCal();drawSum()}})(s);
+    g.appendChild(b);
+  }
+}
+function drawSum(){
+  var total=0, h="";
+  if(st.pkg){var p=PRICE[st.pkg];total+=p;h+="<div><span>Pakej "+st.pkg+"</span><span>"+rm(p)+"</span></div>"}
+  else h+="<div><span>Pakej</span><span>–</span></div>";
+  h+="<div><span>Tarikh</span><span>"+(st.date||"–")+"</span></div>";
+  if(st.bg){total+=st.bg*BG;h+="<div><span>Bride &amp; Groom ×"+st.bg+"</span><span>"+rm(st.bg*BG)+"</span></div>"}
+  if(st.att){total+=st.att*ATT;h+="<div><span>Petugas ×"+st.att+"</span><span>"+rm(st.att*ATT)+"</span></div>"}
+  h+="<div class='t'><span>Jumlah</span><span>"+rm(total)+"</span></div>";
+  h+="<div><span>Deposit 50%</span><span>"+rm(total/2)+"</span></div>";
+  $("sum").innerHTML=h; st.total=total;
+}
+document.querySelectorAll(".card").forEach(function(c){c.onclick=function(){
+  st.pkg=c.dataset.p;$("pA").classList.toggle("sel",st.pkg==="A");$("pB").classList.toggle("sel",st.pkg==="B");drawSum()}});
+document.querySelectorAll(".qty button").forEach(function(b){b.onclick=function(){
+  var k=b.dataset.a; st[k]=Math.max(0,Math.min(20,st[k]+Number(b.dataset.d))); $("q_"+k).textContent=st[k]; drawSum()}});
+$("prev").onclick=function(){var m=new Date(view.getFullYear(),view.getMonth()-1,1);if(m>=new Date(today.getFullYear(),today.getMonth(),1)){view=m;drawCal()}};
+$("next").onclick=function(){view=new Date(view.getFullYear(),view.getMonth()+1,1);drawCal()};
+function build(){
+  var n=$("name").value.trim(), ph=$("phone").value.trim(), v=$("venue").value.trim(), t=$("time").value.trim();
+  var e=$("err");
+  if(!st.pkg){e.textContent="Sila pilih pakej.";return}
+  if(!st.date){e.textContent="Sila pilih tarikh.";return}
+  if(!n||!ph){e.textContent="Sila isi nama & no. telefon.";return}
+  e.textContent="";
+  var m="Salam, saya nak tempah LEGO Guestbook:\n"+
+  "Nama: "+n+"\nTel: "+ph+"\nPakej: "+st.pkg+" ("+rm(PRICE[st.pkg])+")\nTarikh: "+st.date+
+  "\nMasa: "+(t||"-")+"\nLokasi: "+(v||"-")+
+  "\nBride & Groom: "+st.bg+" pasangan\nPetugas: "+st.att+" orang\n"+
+  "Jumlah: "+rm(st.total)+" (deposit 50%: "+rm(st.total/2)+")";
+  return m;
+}
+$("go").onclick=function(){var m=build();if(!m)return;
+  try{navigator.clipboard.writeText(m).catch(function(){})}catch(x){}
+  window.open(FORM_URL,"_blank")};
+$("wa").onclick=function(){var m=build();if(!m)return;
+  window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(m),"_blank")};
+drawCal();drawSum();
+</script>
+</body>
+</html>
